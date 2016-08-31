@@ -1,7 +1,0 @@
-#!/bin/bash
-
-STRANDS_HOSTNAME=$(echo $HOSTNAME | tr A-Z a-z | sed -e 's/[^a-zA-Z0-9\-]/_/g ' -e 's/-/_/g' -e 's/ /_/g')
-
-echo 'The strands hostname is ' $STRANDS_HOSTNAME
-
-echo 'export STRANDS_HOSTNAME='$STRANDS_HOSTNAME >> $HOME/.bashrc

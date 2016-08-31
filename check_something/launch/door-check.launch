@@ -1,5 +1,0 @@
-<launch>
-
-  <node pkg="door_pass" type="door_detect" name="door_detector"  output="screen"/>
-  <node pkg="check_something" type="check_door.py" name="door_check_reporter"  output="screen"/>
-</launch>
