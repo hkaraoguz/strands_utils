@@ -93,11 +93,28 @@ void write_sphere_msg(primitive_extraction::Primitive& msg, const Eigen::VectorX
 void extract(primitive_extraction::PrimitiveArray& msg_array, std::vector<base_primitive*>& extracted, 
              const sensor_msgs::PointCloud2& msg)
 {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr msg_cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    pcl::PointCloud<pcl::PointXYZ>::Ptr temp_msg_cloud(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
-    pcl::fromROSMsg(msg, *msg_cloud);
+    pcl::fromROSMsg(msg, *temp_msg_cloud);
     
-    ROS_INFO("Got a point cloud of size %lu", msg_cloud->size());
+    ROS_INFO("Got a point cloud of size %lu", temp_msg_cloud->size());
+    pcl::PointCloud<pcl::PointXYZ>::Ptr msg_cloud(new pcl::PointCloud<pcl::PointXYZ>());
+
+    std::vector<int> indices;
+
+    temp_msg_cloud->is_dense = false; // this should be false inorder to removenan to work otherwise it just copies the data as it is
+
+    pcl::removeNaNFromPointCloud(*temp_msg_cloud,*msg_cloud, indices);
+
+    pcl::PointXYZ min_pt;
+    pcl::PointXYZ max_pt;
+
+    pcl::getMinMax3D	(	*msg_cloud,
+    min_pt,
+    max_pt
+    )	;
+    ROS_INFO("Min points x:%.2f, y%.2f z:%.2f, Max points x:%.2f y:%.2f z:%.2f",min_pt.x,min_pt.y,min_pt.z,max_pt.x,max_pt.y,max_pt.z);
+
     // Create the filtering object
     pcl::VoxelGrid<pcl::PointXYZ> sor;
     sor.setInputCloud(msg_cloud);
@@ -108,6 +125,11 @@ void extract(primitive_extraction::PrimitiveArray& msg_array, std::vector<base_p
     }
     sor.filter(*cloud);
     ROS_INFO("Downsampled to %lu", cloud->size());
+    if(cloud->size() < 10000)
+    {
+        ROS_WARN("Downsampled clouds has very little data. Skipping...");
+        return;
+    }
 
     ros::Time begin = ros::Time::now();
     primitive_extractor<pcl::PointXYZ> extractor(cloud, primitives, params, NULL);

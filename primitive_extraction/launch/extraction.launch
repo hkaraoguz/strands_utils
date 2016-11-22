@@ -38,7 +38,7 @@
 	    <!-- Used to extract the largest connected region -->
 	    <param name="connectedness_dist" type="double" value="0.04"/>
 	    <!-- Do not consider any points further away from the camera than this -->
-	    <param name="distance_threshold" type="double" value="0.0"/>
+	    <param name="distance_threshold" type="double" value="100.0"/>
 	    <!-- Choose which types of primitives to extract -->
 	    <param name="extract_planes" type="bool" value="$(arg extract_planes)"/>
 	    <param name="extract_cylinders" type="bool" value="$(arg extract_cylinders)"/>
